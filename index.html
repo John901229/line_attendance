@@ -12,9 +12,56 @@
   <button onclick="sendData('leave')">請假</button>
   <button onclick="sendData('query')">查詢</button>
 
-  <script>
-    const liffId = "2007506939-KmdkLqmq";  // 改成你自己的
-    const scriptURL = "https://script.google.com/macros/s/AKfycbynvVFS6-FGQPZEDBAYIITjXlESxMsTXpUH9hH39-s9MahdbroXPaHbxbJ2_iXPLbq8sg/exec";  // 改成你部署的 Web App URL
+ <script>
+  const liffId = "2007506939-KmdkLqmq";  // 你的 LIFF ID
+  const scriptURL = "https://script.google.com/macros/s/AKfycbzTCOkf3-zMrL-3fmX3hlKWPQG8qvikzZ_ZXIrYGg7IimdVSPbLoU5It4gUYA8RO8o01A/exec";
+
+  async function sendData(action) {
+    try {
+      alert("初始化 LIFF 中...");
+      await liff.init({ liffId });
+      alert("LIFF 初始化完成");
+
+      if (!liff.isLoggedIn()) {
+        alert("尚未登入，重新導向登入中...");
+        liff.login();
+        return;
+      }
+
+      const profile = await liff.getProfile();
+      const userId = profile.userId;
+      alert("取得使用者 ID：" + userId);
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          alert("GPS 位置取得成功：" + lat + "," + lng);
+
+          const payload = {
+            action,
+            userId,
+            gps: { lat, lng }
+          };
+
+          const res = await fetch(scriptURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await res.text();
+          alert("回傳內容：" + result);
+        },
+        (error) => {
+          alert("GPS 錯誤：" + error.message);
+        }
+      );
+    } catch (e) {
+      alert("錯誤：" + e.message);
+    }
+  }
+</script>
 
     async function sendData(action) {
       await liff.init({ liffId });
