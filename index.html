@@ -13,30 +13,30 @@
   <button onclick="sendData('query')">查詢</button>
 
   <script>
-    const liffId = "2007506939-KmdkLqmq";  // ← 換成你的 LIFF ID
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzqPIhB8lVuxTt2dmKsN_D8zLG7HVhzeJZoDXW-SKI2wGyi2p3pz28Ai1z07O51d-iVOw/exec";  // ← 換成你的 GAS Web App URL
+    const liffId = "2007506939-KmdkLqmq";  // 替換為你的 LIFF ID
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzqPIhB8lVuxTt2dmKsN_D8zLG7HVhzeJZoDXW-SKI2wGyi2p3pz28Ai1z07O51d-iVOw/exec";
 
     async function sendData(action) {
       try {
-        alert("初始化 LIFF 中...");
+        alert("✅ 初始化 LIFF...");
         await liff.init({ liffId });
-        alert("LIFF 初始化完成");
+        alert("✅ LIFF 初始化完成");
 
         if (!liff.isLoggedIn()) {
-          alert("尚未登入，重新導向登入中...");
+          alert("⚠️ 尚未登入，導向登入中...");
           liff.login();
           return;
         }
 
         const profile = await liff.getProfile();
         const userId = profile.userId;
-        alert("取得使用者 ID：" + userId);
+        alert("👤 使用者 ID：" + userId);
 
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            alert("GPS 位置取得成功：" + lat + "," + lng);
+            alert("📍 GPS 成功：" + lat + ", " + lng);
 
             const payload = {
               action,
@@ -51,14 +51,14 @@
             });
 
             const result = await res.text();
-            alert("回傳內容：" + result);
+            alert("✅ 伺服器回應：" + result);
           },
           (error) => {
-            alert("GPS 錯誤：" + error.message);
+            alert("❌ GPS 錯誤：" + error.message);
           }
         );
       } catch (e) {
-        alert("錯誤：" + e.message);
+        alert("❌ 發生錯誤：" + e.message);
       }
     }
   </script>
