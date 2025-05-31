@@ -1,97 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>打卡小幫手</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <meta charset="UTF-8">
+  <title>打卡小幫手</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <h2>打卡系統</h2>
-  <button onclick="sendData('clock_in')">上班</button>
-  <button onclick="sendData('clock_out')">下班</button>
-  <button onclick="sendData('leave')">請假</button>
-  <button onclick="sendData('query')">查詢</button>
+  <h2>打卡系統</h2>
+  <button onclick="sendData('clock_in')">上班</button>
+  <button onclick="sendData('clock_out')">下班</button>
+  <button onclick="sendData('leave')">請假</button>
+  <button onclick="sendData('query')">查詢</button>
 
- <script>
-  const liffId = "2007506939-KmdkLqmq";  // 你的 LIFF ID
-  const scriptURL = "https://script.google.com/macros/s/AKfycbynvVFS6-FGQPZEDBAYIITjXlESxMsTXpUH9hH39-s9MahdbroXPaHbxbJ2_iXPLbq8sg/exec";
+  <script>
+    const liffId = "2007506939-KmdkLqmq";  // ← 換成你的 LIFF ID
+    const scriptURL = "https://script.google.com/macros/s/AKfycbynvVFS6-FGQPZEDBAYIITjXlESxMsTXpUH9hH39-s9MahdbroXPaHbxbJ2_iXPLbq8sg/exec";  // ← 換成你的 GAS Web App URL
 
-  async function sendData(action) {
-    try {
-      alert("初始化 LIFF 中...");
-      await liff.init({ liffId });
-      alert("LIFF 初始化完成");
+    async function sendData(action) {
+      try {
+        alert("初始化 LIFF 中...");
+        await liff.init({ liffId });
+        alert("LIFF 初始化完成");
 
-      if (!liff.isLoggedIn()) {
-        alert("尚未登入，重新導向登入中...");
-        liff.login();
-        return;
-      }
+        if (!liff.isLoggedIn()) {
+          alert("尚未登入，重新導向登入中...");
+          liff.login();
+          return;
+        }
 
-      const profile = await liff.getProfile();
-      const userId = profile.userId;
-      alert("取得使用者 ID：" + userId);
+        const profile = await liff.getProfile();
+        const userId = profile.userId;
+        alert("取得使用者 ID：" + userId);
 
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          alert("GPS 位置取得成功：" + lat + "," + lng);
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            alert("GPS 位置取得成功：" + lat + "," + lng);
 
-          const payload = {
-            action,
-            userId,
-            gps: { lat, lng }
-          };
+            const payload = {
+              action,
+              userId,
+              gps: { lat, lng }
+            };
 
-          const res = await fetch(scriptURL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
+            const res = await fetch(scriptURL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
 
-          const result = await res.text();
-          alert("回傳內容：" + result);
-        },
-        (error) => {
-          alert("GPS 錯誤：" + error.message);
-        }
-      );
-    } catch (e) {
-      alert("錯誤：" + e.message);
-    }
-  }
-</script>
-
-    async function sendData(action) {
-      await liff.init({ liffId });
-      if (!liff.isLoggedIn()) liff.login();
-
-      const profile = await liff.getProfile();
-      const userId = profile.userId;
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-
-          const payload = {
-            action,
-            userId,
-            gps: { lat, lng }
-          };
-
-          await fetch(scriptURL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-
-          alert("打卡成功！");
-        },
-        () => alert("無法取得 GPS 位置")
-      );
-    }
-  </script>
+            const result = await res.text();
+            alert("回傳內容：" + result);
+          },
+          (error) => {
+            alert("GPS 錯誤：" + error.message);
+          }
+        );
+      } catch (e) {
+        alert("錯誤：" + e.message);
+      }
+    }
+  </script>
 </body>
 </html>
